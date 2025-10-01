@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 };
 
 interface CarDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const CarDetailPage = async ({ params }: CarDetailPageProps) => {
-  const car = await getCarById(params.id);
+  const { id } = await params;
+  const car = await getCarById(id);
 
   if (!car) return notFound();
   return (

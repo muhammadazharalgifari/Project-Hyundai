@@ -2,8 +2,12 @@ import EditFormCar from "@/components/admin/cars/Edit-Form-Car";
 import { getCarById } from "@/lib/data";
 import { notFound } from "next/navigation";
 
-const UpdateCarPage = async ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+const UpdateCarPage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const { id } = await params;
   const car = await getCarById(id);
 
   if (!car) return notFound();
