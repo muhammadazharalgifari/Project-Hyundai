@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Category {
+  id            String          @id @default(cuid())
+  name          String          @unique
+  cars          Car[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model SpecCategory {
+  id            String          @id @default(cuid())
+  name          String
+  Specification Specification[]
+}
+
+model Car {
+  id            String          @id @default(cuid())
+  name          String
+  description   String
+  price         Int
+  year          Int?
+  image         String
+  capacity      Int                 @default(1)
+  categoryId    String
+  Category      Category  @relation(fields: [categoryId], references: [id])
+  CarSpec       CarSpec[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model Specification {
+  id            String          @id @default(cuid())
+  name          String
+  specCategoryId  String
+  SpecCategory  SpecCategory  @relation(fields: [specCategoryId],references: [id])
+  CarSpec       CarSpec[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model CarSpec {
+  id            String          @id @default(cuid())
+  carId         String
+  specId        String
+  Car           Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+  Specification Specification @relation(fields: [specId],references: [id],onDelete: Cascade)
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  role          String          @default("user")
+  phone         String?
+  accounts      Account[]
+  contact       Contact[]
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+
+model Contact {
+  id              String         @id @default(cuid())
+  name            String
+  email           String
+  subject         String
+  message         String
+  user            User?           @relation(fields: [userId],references: [id])
+  userId          String?
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
